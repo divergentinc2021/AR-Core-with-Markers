@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ARFoundation.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 0
@@ -14,6 +14,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SimpleVideoplacement2D.unity
     guid: 66590f65131ace5448afbf6501c3a926
+  - enabled: 0
+    path: Assets/Scenes/ARFoundation_markercombinedwithmarkerless.unity
+    guid: 56fd6b046c382b449ac79176c3373fb7
+  - enabled: 1
+    path: Assets/Scenes/ARFoundation_markerless_codelabs.unity
+    guid: be84e330e3513314c8b054fa4391b548
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: c70a3cd02cfa61a4a8d44b57270362c8, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: ef97f1ff290386741baaaa208024abda, type: 2}

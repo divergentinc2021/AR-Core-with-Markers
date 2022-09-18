@@ -3,76 +3,90 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class ARRaycasting : MonoBehaviour
 {
+    public int fingerID;
 
     public ARRaycastManager arRaycastManager;
 
     private List<ARRaycastHit> raycastHitList = new List<ARRaycastHit>();
 
-    public Text Infotext;
+    public GameObject AnchorPlacement;
 
-    public GameObject prefab;
+    public ARPlane ARPlaneManager;
 
-    public GameObject ARPlaneManager;
+    public GameObject Infotext;
 
-    public GameObject InitialPrefab;
+    //declare event types to listen to
+    public UnityEvent onBegan;
+    public UnityEvent onStationary;
+    public UnityEvent onMoved;
+    public UnityEvent onEnded;
+    public UnityEvent onCancelled;
 
-    GameObject Spawnpoint;
-    //GameObject CurrentlySelected { get; private set; }
-    GameObject CurrentlySelected;
-    private void Start()
-    {
-        Spawnpoint = Instantiate(InitialPrefab, ARPlaneManager.transform);
-    }
-
+    GameObject AnchorObj;
 
     // Update is called once per frame
     void Update()
     {
+        detecttouch();
+        Anchordetect();
+    }
 
+    public void Anchordetect()
+    {
         if (Input.touchCount < 1)
         {
+            AnchorObj = Instantiate(AnchorPlacement, ARPlaneManager.transform);
             return;
         }
+    }
+
+    public void detecttouch()
+    {
+        int touchCount = Input.touchCount;
 
 
-        if (arRaycastManager.Raycast(Input.GetTouch(0).position, raycastHitList, TrackableType.AllTypes))
+        for (int i = 0; i < touchCount; i++)
         {
-            Vector3 hitPosition = raycastHitList[0].pose.position;
-
-            switch (Input.GetTouch(0).phase)
+            if (Input.GetTouch(i).fingerId == fingerID)
             {
-                case TouchPhase.Began:
-                    Destroy(Spawnpoint);
-                    Destroy(Infotext);
-                    Destroy(CurrentlySelected);
-                    CurrentlySelected = Instantiate(prefab, hitPosition, Quaternion.identity, null);
-                    break;
-
-                case TouchPhase.Moved:
-                case TouchPhase.Stationary:
-                    PlaceInstanceWithOffset((CurrentlySelected, hitPosition));
-                    break;
-
-                case TouchPhase.Ended:
-                case TouchPhase.Canceled:
-                    StartCoroutine(DropOntoFloor((CurrentlySelected, hitPosition)));
-                    break;
-            
+                Destroy(Infotext);
+                Destroy(AnchorObj);
+                arRaycastManager.Raycast(Input.GetTouch(i).position, raycastHitList, TrackableType.AllTypes);
+                //Debug.Log("Getting Touch Finger ID");
+                Vector3 hitposition = raycastHitList[i].pose.position;
+                ProcessPhase(Input.GetTouch(i).phase);
+                //print(MovingObject.transform.position);
             }
         }
+
     }
 
-    private string DropOntoFloor((object CurrentlySelected, Vector3 hitPosition) p)
+    public void ProcessPhase(TouchPhase phase)
     {
-        throw new System.NotImplementedException();
+            switch (phase)
+            {
+                case TouchPhase.Began:
+                    onBegan.Invoke();
+                    break;
+                case TouchPhase.Stationary:
+                    onStationary.Invoke();
+                    break;
+                case TouchPhase.Moved:
+                    onMoved.Invoke();
+                    break;
+                case TouchPhase.Ended:
+                    onEnded.Invoke();
+                    break;
+                case TouchPhase.Canceled:
+                    onCancelled.Invoke();
+                    break;
+            }
     }
 
-    private void PlaceInstanceWithOffset((object CurrentlySelected, Vector3 hitPosition) p)
-    {
-        throw new System.NotImplementedException();
-    }
+
+
 }
